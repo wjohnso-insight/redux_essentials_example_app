@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, nanoid } from '@reduxjs/toolkit'
 
 const initialState = [
     { id: '1', title: 'First Post!', content: 'Hello!' },
@@ -20,6 +20,15 @@ const postsSlice = createSlice({
                 * We can safely break those rules inside createSlice(), as it is integrated
                 * with Immer.js
             */
+        },
+        prepare(title, content){ //* This is a `prepare callback function`, (https://www.craft.do/s/mzSV9LeJUQZM38)
+            return {
+                payload: {
+                    id: nanoid(),
+                    title,
+                    content
+                }
+            }
         },
         postUpdated(state,action){
             const { id, title, content } = action.payload //* Destructuring the payload
