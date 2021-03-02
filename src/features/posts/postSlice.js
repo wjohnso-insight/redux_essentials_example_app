@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, nanoid } from '@reduxjs/toolkit'
 
 const initialState = [
     { id: '1', title: 'First Post!', content: 'Hello!' },
@@ -20,11 +20,28 @@ const postsSlice = createSlice({
                 * We can safely break those rules inside createSlice(), as it is integrated
                 * with Immer.js
             */
+        },
+        prepare(title, content){ //* This is a `prepare callback function`, (https://www.craft.do/s/mzSV9LeJUQZM38)
+            return {
+                payload: {
+                    id: nanoid(),
+                    title,
+                    content
+                }
+            }
+        },
+        postUpdated(state,action){
+            const { id, title, content } = action.payload //* Destructuring the payload
+            const existingPost = state.find(post => post.id === id) //* Matching post in state
+            if(existingPost) {
+                existingPost.title = title //* Mutate value
+                existingPost.content = content //*Mutate value, thanks Immer!
+            }
         }
     }
 })
 
-export const { postAdded } = postsSlice.actions 
+export const { postAdded, postUpdated } = postsSlice.actions 
 /* 
     * This !== postAdded method in reducers object above. 
     * Here, postAdded is an 'action creator' (https://www.craft.do/s/4arQORaj0iFD59)
