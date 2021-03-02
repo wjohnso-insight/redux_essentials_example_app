@@ -20,6 +20,9 @@ export const AddPostForm = () => {
                 id: nanoid(), //* Random id : String
                 title, //* From local state
                 content //* From local state
+                /*
+                    * { id: string, title: string, content: string } === action.payload
+                */
             })
         )
 
