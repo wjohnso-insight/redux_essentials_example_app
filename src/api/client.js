@@ -1,11 +1,11 @@
 // A tiny wrapper around fetch(), borrowed from
 // https://kentcdodds.com/blog/replace-axios-with-a-simple-custom-fetch-wrapper
 
-export async function client(endpoint, { body, ...customConfig } = {}) {
+export async function client(endpoint, { body, ...customConfig } = {}) { //Sets default param to empty object if a second parameter isn't passed in, to preserve destructuring
   const headers = { 'Content-Type': 'application/json' }
 
   const config = {
-    method: body ? 'POST' : 'GET',
+    method: body ? 'POST' : 'GET', //If there is a body, let request type be 'POST' else let request type be 'GET'
     ...customConfig,
     headers: {
       ...headers,
