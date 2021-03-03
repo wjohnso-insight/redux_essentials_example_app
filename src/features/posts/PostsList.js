@@ -10,8 +10,9 @@ export const PostsList = () => {
     const renderedPosts = posts.map(post => (
         <article className="post-excerpt" key={post.id}>
             <h3>{post.title}</h3>
-            <p className="post-content">{post.content.substring(0,100)}</p>
-            <PostAuthor userId={post.user} />
+            <h5><PostAuthor userId={post.user} /></h5>
+            {/* //* Displays first 100 characters of post content as a preview*/}
+            <p className="post-content">{post.content.substring(0,100)}</p> 
             <Link to={`/posts/${post.id}`} className="button muted-button">
                 View Post
             </Link>
