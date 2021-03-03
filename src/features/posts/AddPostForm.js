@@ -20,7 +20,7 @@ export const AddPostForm = () => {
     if (title && content) { //* Local state equality check
       dispatch(postAdded(title, content, userId)) 
       /*
-        * Can pass `title` & `content` params
+        * Can pass `title` , `content`, & `userId` params
         * instead of constructing a payload because we added
         * a `prepare callback function` to `reducers object`
         * @ postSlice
@@ -34,7 +34,7 @@ export const AddPostForm = () => {
 
   const userOptions = users.map(user => (
     <option key={user.id} value={user.id}>
-      {user.nam}
+      {user.name}
     </option>
   ))
 

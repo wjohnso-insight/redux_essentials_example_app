@@ -1,33 +1,26 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit'
 
 const initialState = [
-    { id: '1', title: 'First Post!', content: 'Hello!' },
-    { id: '2', title: 'Second Post', content: 'More text' }
+    { id: '1', title: 'First Post!', content: 'Hello!', user: "1" },
+    { id: '2', title: 'Second Post', content: 'More text', user: "2" }
 ] //TODO: Refactor to use mirage.js API & faker.js data
 
 const postsSlice = createSlice({
-    name: 'posts', // This slice will be accessed as postsReducer in global store
-    initialState, //*  Set with ES6 'object property value shorthand' https://www.craft.do/s/QvB4jxgOhoiWWE
+    name: 'posts',
+    initialState,
     reducers: {
-        postAdded(state,action){ //* Receives current state value & the action that was dispatched
-            state.push(action.payload) 
-            /*
-                * 1. action.payload === new PostEntry: {title: string, content: string} 
-                * 2. Reducer functions should always be:
-                *   a. pure functions
-                *   b. update state without mutations
-                * 
-                * We can safely break those rules inside createSlice(), as it is integrated
-                * with Immer.js
-            */
-        },
-        prepare(title, content, userId){ //* This is a `prepare callback function`, (https://www.craft.do/s/mzSV9LeJUQZM38)
-            return {
-                payload: {
-                    id: nanoid(),
-                    title,
-                    content,
-                    user: userId
+        postAdded:{
+            reducer(state,action){
+                state.push(action.payload)
+            },
+            prepare(title,content, userId){
+                return{
+                    payload: {
+                        id: nanoid(),
+                        title,
+                        content,
+                        user: userId
+                    }
                 }
             }
         },
@@ -41,6 +34,7 @@ const postsSlice = createSlice({
         }
     }
 })
+        
 
 export const { postAdded, postUpdated } = postsSlice.actions 
 /* 
