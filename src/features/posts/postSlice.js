@@ -21,12 +21,13 @@ const postsSlice = createSlice({
                 * with Immer.js
             */
         },
-        prepare(title, content){ //* This is a `prepare callback function`, (https://www.craft.do/s/mzSV9LeJUQZM38)
+        prepare(title, content, userId){ //* This is a `prepare callback function`, (https://www.craft.do/s/mzSV9LeJUQZM38)
             return {
                 payload: {
                     id: nanoid(),
                     title,
-                    content
+                    content,
+                    user: userId
                 }
             }
         },
