@@ -3,10 +3,11 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
+import { selectAllPosts } from './postSlice' //* Reusable Selector Function 
 
 export const PostsList = () => {
 
-    const posts = useSelector(state => state.posts) //* Gets the data from global state object and returns posts field as an array
+    const posts = useSelector(selectAllPosts) //* Reusable Selector (TBH, not sure why selectAllPosts isn't passed `state` object as param?)
     
     const orderedPosts = posts.slice().sort((a,b) => b.date.localeCompare(a.date));
 
@@ -26,6 +27,6 @@ export const PostsList = () => {
         <section className="posts-list">
             <h2>Posts</h2>
             {renderedPosts}
-        </section>
+        </section> 
     )
 }

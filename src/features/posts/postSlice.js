@@ -1,7 +1,21 @@
 import { createSlice, nanoid } from '@reduxjs/toolkit'
 import { sub } from 'date-fns'
 
-const initialState = [
+/*
+    TODO - Extract Posts Selectors
+        [] Change initial state to object that 
+            1. Contains the (current) posts array
+            2. Contains current loading state fields
+        [] Update selectors in components that access Posts state 
+            [√] <PostsList>
+                - Access list of all post
+            [√] <SinglePostPage>
+                - Access single post by id
+            [√] <EditPostForm>
+                - Access single post by id
+
+*/
+const initialState = [ //Current posts array
     { 
         id: '1', 
         title: 'First Post!', 
@@ -87,3 +101,21 @@ export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 */
 
 export default postsSlice.reducer 
+
+/*
+    * REUSABLE SELECTOR FUNCTIONS
+    * Allows for sharing slice logic across components vs. repeating that logic (see <EditPostForm> & <SinglePostForm>)
+    * So now, if global state shape changes, only these function need to be updated, vs updating
+    * each component
+*/
+
+export const selectAllPosts = state => state.posts //* <PostList>
+
+export const selectPostById = (state, postId) =>  //* <EditPostForm> & <SinglePostPage>
+    state.posts.find(post => post.id === postId)
+
+/*
+    * Note that the reuseable selectors take the global `state` object as a parameter. 
+    * This is provided at the component level by calling the reusable selector inside
+    * `useSelector()`, which provides access to the `state` object at the component level
+*/
