@@ -1,14 +1,23 @@
-import React from 'react'
-import { useSelector } from 'react-redux' 
+import React, { useEffect } from 'react'
+import { useSelector, useDispatch } from 'react-redux' 
 import { Link } from 'react-router-dom'
 import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
-import { selectAllPosts } from './postSlice' //* Reusable Selector Function 
+import { selectAllPosts, fetchPosts } from './postSlice' //* Reusable Selector Function 
 
 export const PostsList = () => {
 
+    const dispatch = useDispatch();
     const posts = useSelector(selectAllPosts) //* Reusable Selector (TBH, not sure why selectAllPosts isn't passed `state` object as param?)
     
+    const postStatus = useSelector(state => state.posts.status)
+
+    useEffect(() => {
+        if(postStatus === 'idle'){ //* postStatus prevents us from calling dispatch() every time the component renders
+            dispatch(fetchPosts())
+        }
+    }, [postStatus, dispatch])
+
     const orderedPosts = posts.slice().sort((a,b) => b.date.localeCompare(a.date));
 
     const renderedPosts = orderedPosts.map(post => (

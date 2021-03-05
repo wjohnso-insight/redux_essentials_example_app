@@ -1,25 +1,16 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit'
-import { sub } from 'date-fns'
+import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit'
+import { client } from '../../api/client'
 
-/*
-    TODO - Extract Posts Selectors
-        [√] Change initial state to object that 
-            1. Contains the (current) posts array
-            2. Contains current loading state fields
-        [√] Update selectors in components that access Posts state 
-            [√] <PostsList>
-                - Access list of all post
-            [√] <SinglePostPage>
-                - Access single post by id
-            [√] <EditPostForm>
-                - Access single post by id
-
-*/
 const initialState = {
     posts: [],
     status: 'idle',
     error: null
 } //TODO: Refactor to use mirage.js API & faker.js data
+
+export const fetchPosts = createAsyncThunk('post/fetchPosts', async () => {
+    const response = await client.get('/fakeApi/posts')
+    return response.posts
+})
 
 const postsSlice = createSlice({
     name: 'posts',
@@ -94,3 +85,4 @@ export const selectPostById = (state, postId) =>  //* <EditPostForm> & <SinglePo
     * This is provided at the component level by calling the reusable selector inside
     * `useSelector()`, which provides access to the `state` object at the component level
 */
+
