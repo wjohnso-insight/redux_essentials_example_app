@@ -3,10 +3,10 @@ import { sub } from 'date-fns'
 
 /*
     TODO - Extract Posts Selectors
-        [] Change initial state to object that 
+        [√] Change initial state to object that 
             1. Contains the (current) posts array
             2. Contains current loading state fields
-        [] Update selectors in components that access Posts state 
+        [√] Update selectors in components that access Posts state 
             [√] <PostsList>
                 - Access list of all post
             [√] <SinglePostPage>
@@ -15,36 +15,11 @@ import { sub } from 'date-fns'
                 - Access single post by id
 
 */
-const initialState = [ //Current posts array
-    { 
-        id: '1', 
-        title: 'First Post!', 
-        content: 'Hello!', 
-        date: sub(new Date(), { minutes: 10 }).toISOString(), //* Makes date 10 minutes ago
-        user: "1",
-        reactions: {
-            thumbsUp: 0, 
-            hooray: 0,
-            heart: 0,
-            rocket: 0,
-            eyes: 0 
-        }
-    },
-    { 
-        id: '2', 
-        title: 'Second Post',
-        content: 'More text', 
-        date: sub(new Date(), { minutes: 5 }).toISOString(),
-        user: "2",
-        reactions: {
-            thumbsUp: 0, 
-            hooray: 0,
-            heart: 0,
-            rocket: 0,
-            eyes: 0 
-        }
-    }
-] //TODO: Refactor to use mirage.js API & faker.js data
+const initialState = {
+    posts: [],
+    status: 'idle',
+    error: null
+} //TODO: Refactor to use mirage.js API & faker.js data
 
 const postsSlice = createSlice({
     name: 'posts',
@@ -52,14 +27,14 @@ const postsSlice = createSlice({
     reducers: {
         reactionAdded(state,action){
             const { postId, reaction } = action.payload
-            const existingPost = state.find(post => post.id === postId)
+            const existingPost = state.posts.find(post => post.id === postId)
             if(existingPost){
                 existingPost.reactions[reaction]++
             }
         },
         postAdded:{
             reducer(state,action){
-                state.push(action.payload)
+                state.posts.push(action.payload)
             },
             prepare(title,content, userId){
                 return{
@@ -82,7 +57,7 @@ const postsSlice = createSlice({
         },
         postUpdated(state,action){
             const { id, title, content } = action.payload //* Destructuring the payload
-            const existingPost = state.find(post => post.id === id) //* Matching post in state
+            const existingPost = state.posts.find(post => post.id === id) //* Matching post in state
             if(existingPost) {
                 existingPost.title = title //* Mutate value
                 existingPost.content = content //*Mutate value, thanks Immer!
@@ -109,10 +84,10 @@ export default postsSlice.reducer
     * each component
 */
 
-export const selectAllPosts = state => state.posts //* <PostList>
+export const selectAllPosts = state => state.posts.posts //* <PostList>
 
 export const selectPostById = (state, postId) =>  //* <EditPostForm> & <SinglePostPage>
-    state.posts.find(post => post.id === postId)
+    state.posts.posts.find(post => post.id === postId)
 
 /*
     * Note that the reuseable selectors take the global `state` object as a parameter. 
