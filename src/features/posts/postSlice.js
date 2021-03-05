@@ -5,7 +5,18 @@ const initialState = {
     posts: [],
     status: 'idle',
     error: null
-} //TODO: Refactor to use mirage.js API & faker.js data
+} 
+
+export const addNewPost = createAsyncThunk(
+    'posts/addNewPost',
+    //* The payload creator receives the partial `{title, content, user}` object
+    async initialPost => {
+        //* Send the initial data to the fake API server
+        const response = await client.post('/fakeApi/posts', { post: initialPost })
+        //* The response include the complete post object, including unique ID
+        return response.post
+    }
+)
 
 export const fetchPosts = createAsyncThunk('post/fetchPosts', async () => {
     const response = await client.get('/fakeApi/posts')
@@ -61,12 +72,16 @@ const postsSlice = createSlice({
         },
         [fetchPosts.fulfilled]: (state, action) => {
             state.status = 'succeeded'
-            //Add any fetched posts to the array
+            //* Add any fetched posts to the array
             state.posts = state.posts.concat(action.payload)
         },
         [fetchPosts.rejected]: (state, action) => {
             state.status = 'failed'
             state.error = action.error.message
+        },
+        [addNewPost.fulfilled]: (state, action) => {
+            //* We can directly add the new post object to our posts array
+            state.posts.push(action.payload)
         }
     }
 })

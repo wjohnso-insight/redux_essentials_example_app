@@ -3,8 +3,8 @@ import { client } from '../../api/client'
 
 /* 
   To Do:
-    [] Return users using `createAsyncThunk()`
-    [] Handled `fulfilled` action at `extraReducers`
+    [√] Return users using `createAsyncThunk()`
+    [√] Handled `fulfilled` action at `extraReducers`
 */
 const initialState = []
 
