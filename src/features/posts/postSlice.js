@@ -1,36 +1,27 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit'
-import { sub } from 'date-fns'
+import { createSlice, nanoid, createAsyncThunk } from '@reduxjs/toolkit'
+import { client } from '../../api/client'
 
-const initialState = [
-    { 
-        id: '1', 
-        title: 'First Post!', 
-        content: 'Hello!', 
-        date: sub(new Date(), { minutes: 10 }).toISOString(), //* Makes date 10 minutes ago
-        user: "1",
-        reactions: {
-            thumbsUp: 0, 
-            hooray: 0,
-            heart: 0,
-            rocket: 0,
-            eyes: 0 
-        }
-    },
-    { 
-        id: '2', 
-        title: 'Second Post',
-        content: 'More text', 
-        date: sub(new Date(), { minutes: 5 }).toISOString(),
-        user: "2",
-        reactions: {
-            thumbsUp: 0, 
-            hooray: 0,
-            heart: 0,
-            rocket: 0,
-            eyes: 0 
-        }
+const initialState = {
+    posts: [],
+    status: 'idle',
+    error: null
+} 
+
+export const addNewPost = createAsyncThunk(
+    'posts/addNewPost',
+    //* The payload creator receives the partial `{title, content, user}` object
+    async initialPost => {
+        //* Send the initial data to the fake API server
+        const response = await client.post('/fakeApi/posts', { post: initialPost })
+        //* The response include the complete post object, including unique ID
+        return response.post
     }
-] //TODO: Refactor to use mirage.js API & faker.js data
+)
+
+export const fetchPosts = createAsyncThunk('post/fetchPosts', async () => {
+    const response = await client.get('/fakeApi/posts')
+    return response.posts
+})
 
 const postsSlice = createSlice({
     name: 'posts',
@@ -38,14 +29,14 @@ const postsSlice = createSlice({
     reducers: {
         reactionAdded(state,action){
             const { postId, reaction } = action.payload
-            const existingPost = state.find(post => post.id === postId)
+            const existingPost = state.posts.find(post => post.id === postId)
             if(existingPost){
                 existingPost.reactions[reaction]++
             }
         },
         postAdded:{
             reducer(state,action){
-                state.push(action.payload)
+                state.posts.push(action.payload)
             },
             prepare(title,content, userId){
                 return{
@@ -68,11 +59,29 @@ const postsSlice = createSlice({
         },
         postUpdated(state,action){
             const { id, title, content } = action.payload //* Destructuring the payload
-            const existingPost = state.find(post => post.id === id) //* Matching post in state
+            const existingPost = state.posts.find(post => post.id === id) //* Matching post in state
             if(existingPost) {
                 existingPost.title = title //* Mutate value
                 existingPost.content = content //*Mutate value, thanks Immer!
             }
+        }
+    },
+    extraReducers:{
+        [fetchPosts.pending]: (state, action) => {
+            state.status = 'loading'
+        },
+        [fetchPosts.fulfilled]: (state, action) => {
+            state.status = 'succeeded'
+            //* Add any fetched posts to the array
+            state.posts = state.posts.concat(action.payload)
+        },
+        [fetchPosts.rejected]: (state, action) => {
+            state.status = 'failed'
+            state.error = action.error.message
+        },
+        [addNewPost.fulfilled]: (state, action) => {
+            //* We can directly add the new post object to our posts array
+            state.posts.push(action.payload)
         }
     }
 })
@@ -87,3 +96,22 @@ export const { postAdded, postUpdated, reactionAdded } = postsSlice.actions
 */
 
 export default postsSlice.reducer 
+
+/*
+    * REUSABLE SELECTOR FUNCTIONS
+    * Allows for sharing slice logic across components vs. repeating that logic (see <EditPostForm> & <SinglePostForm>)
+    * So now, if global state shape changes, only these function need to be updated, vs updating
+    * each component
+*/
+
+export const selectAllPosts = state => state.posts.posts //* <PostList>
+
+export const selectPostById = (state, postId) =>  //* <EditPostForm> & <SinglePostPage>
+    state.posts.posts.find(post => post.id === postId)
+
+/*
+    * Note that the reuseable selectors take the global `state` object as a parameter. 
+    * This is provided at the component level by calling the reusable selector inside
+    * `useSelector()`, which provides access to the `state` object at the component level
+*/
+

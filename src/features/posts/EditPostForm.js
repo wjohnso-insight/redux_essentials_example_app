@@ -2,14 +2,12 @@ import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom' //* Custom hook for accessing History instance for nav
 
-import { postUpdated } from './postSlice'
+import { postUpdated, selectPostById } from './postSlice'
 
 export const EditPostForm = ({ match }) => {
   const { postId } = match.params
 
-  const post = useSelector(state =>
-    state.posts.find(post => post.id === postId) //* Return post that matches postId, used to set initial state
-  )
+  const post = useSelector(state => selectPostById(state, postId)) //* Reusable Selector Function
 
   const [title, setTitle] = useState(post.title) //* Local state; initial state === global state
   const [content, setContent] = useState(post.content) //* Local state; initial state === global state

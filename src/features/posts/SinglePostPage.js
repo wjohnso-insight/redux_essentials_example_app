@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { PostAuthor } from './PostAuthor'
 import { ReactionButtons } from './ReactionButtons'
+import { selectPostById } from './postSlice' //* Reusable selector function 
 
 export const SinglePostPage = ({ match }) => { 
   /*
@@ -11,9 +12,7 @@ export const SinglePostPage = ({ match }) => {
 
   const { postId } = match.params
 
-  const post = useSelector(state =>
-    state.posts.find(post => post.id === postId) //* Return first post with matching post ID
-  )
+  const post = useSelector(state => selectPostById(state, postId)) //* Reusable selector function
 
   if (!post) {
     return (
