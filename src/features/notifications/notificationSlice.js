@@ -29,10 +29,20 @@ export const fetchNotifications = createAsyncThunk(
     const notificationSlice = createSlice({
         name: 'notifications',
         initialState: [],
-        reducers:{},
+        reducers:{
+            allNotificationsRead(state,action){ //* This reduced marks all notifications in state as `read`
+                state.forEach(notification => {
+                    notification.read = true
+                })
+            }
+        },
         extraReducers:{
             [fetchNotifications.fulfilled]: (state, action) =>{
                 //* action.payload is an array of notifications. By spreading them into state.push
+                state.forEach(notification => {
+                    //* Any notification that you've read is no longer new
+                    notification.isNew = !notification.read
+                })
                 //* they are pushed into state one at a time, and not as an array
                 state.push(...action.payload) 
                 //* Sort with newest first
@@ -41,6 +51,8 @@ export const fetchNotifications = createAsyncThunk(
         }
     }
 )
+
+export const { allNotificationsRead } = notificationSlice.actions
 
 export default notificationSlice.reducer
 
